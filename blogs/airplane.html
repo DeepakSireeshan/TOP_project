@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airplane seating conundrum</title>
+    <link href = "../style.css" rel = "stylesheet">
+</head>
+<body>
+    <img src = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/SSJ100_for_Interjet_-_Interiors_%289016257074%29.jpg/800px-SSJ100_for_Interjet_-_Interiors_%289016257074%29.jpg" alt = "picture of airplane aisle">
+    <h1>
+        Airplane seating conundrum
+    </h1>
+    <h2> The Story </h2>
+    <p>
+        Imagine you are boarding an airplane. You forgot to check in early so you are the last person in the queue. There are a total of 246 passengers including yourself. You all have your assigned seat printed on your boarding pass. Let us call passenger 1, Bob. Bob misplaced his boarding pass just after he crossed the gate security. He doesn&rsquo;t remember his seat number so he randomly chooses a seat after boarding the flight. 
+        Now, the other passengers take their assigned seats if it is unoccupied. But if it is occupied by someone else, they pick another seat at random to sit in. Here is the question:
+    </p>
+    <p>
+        <strong> What is the probability that you (the last passenger) get to sit in your own assigned seat? </strong>
+    </p>
+    <p>
+        Initially, this problem might seem daunting since any seat could have been taken by anyone before and there are a lot of ifs when trying to compute the probability.
+    </p>
+    <p>
+        Let us consider this problem as an experiment so that we can repeat it many times, and record how many times you got your own seat. The proportion should be closer to the theoretical probability. You can use the code below to run your own experiment:
+    </p>
+    <pre><code>
+
+        def experiment(n):  # n is 246 in our story. 
+            seat_number = list(range(1,n+1))
+            rnd.shuffle(seat_number)                                                             # shuffling seats to assign.
+            passenger_dict = {'Passenger '+ str(i): seat_number[i-1] for i in range(1,n+1)}      # assigned seat.
+            lastpasgner_assigned = passenger_dict['Passenger '+str(n)]                           # assigned seat for the last passenger.
+            conflict = rnd.randint(1,n)                                                          # the seat Passenger 1 picks uniformly random.
+            seat_number.remove(conflict)
+            passenger_dict['Passenger 1'] = conflict
+            for i in range(2,n+1):
+                if (passenger_dict['Passenger '+str(i)] == conflict):
+                conflict = rnd.choice(seat_number)                                              # the seat Passenger 'i' picks uniformly random under conflict..
+                passenger_dict['Passenger '+str(i)] = conflict
+                seat_number.remove(conflict)
+                else:
+                seat_number.remove(passenger_dict['Passenger '+str(i)])
+            return (1 if (passenger_dict['Passenger '+str(n)] == lastpasgner_assigned) else 0):
+        </code></pre>
+        <p>
+            I ran this experiment 1000 times and recorded results at every stage. The graph summarizes the result. We can easily see the answer to our problem. 
+        </p>
+        <img src = "empty.png" alt = "graph of the simulation">
+        <p>
+            Isn&rsquo;t that surprising? The answer is 0.5. Let us find out why! The following arguments cannot be considered solid mathematical proof but they will help you write your own argument.
+        </p>
+        <h2> Intuitive explanation </h2>
+        <p>
+            Think about this carefully: If your assigned seat is not available when you board(at last), then the only seat that can possibly be available is <strong> Bob&rsquo;s seat</strong>.
+            If you are not convinced, let us think about it this way. If at any point, someone chooses your seat, you are doomed. There is nothing to think about here. In the same way, if someone chooses to sit on Bob&rsquo;s assigned seat, you are guaranteed to sit in your own seat when you board at last. 
+            You can think of taking Bob&rsquo;s seat as a reset button. Once someone takes Bob&rsquo;s seat, every other seat available will be taken by their rightful owner. So, the only thing affecting your chances is someone picking your seat or Bob&rsquo;s seat. Nothing else matters. 
+            At every stage of boarding, the probability that someone chooses your seat or Bob&rsquo;s seat is the same since they are picking at random. (At every stage the probability of your seat getting picked increases since there are fewer seats but nevertheless, the value is the same for Bob&rsquo;s seat if it is available). 
+            So, the two possibilities are equally likely meaning has a probability of <strong>0.5</strong>. 
+        </p>
+</body>
+</html>
